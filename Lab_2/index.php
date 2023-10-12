@@ -8,8 +8,10 @@
     <title>Grass.ru</title>
 </head>
 <body>
+<?php
+    require_once 'PHP/Header.php';
+?>
     
-<? include "/PHP/Head.php" ?>
     <div class="header_title">
         <div class="header_title_content">
             <div class="header_title_content-page">
@@ -542,5 +544,6 @@
     </div>
 </div>
 </div>
+
 </body>
 </html>
