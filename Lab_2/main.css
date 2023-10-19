@@ -1,0 +1,88 @@
+div.col-1{
+    padding-top: 1%;
+    padding-right: 0;
+}
+
+.have{
+    background-color: #41AD0B;  
+    padding: 1%, 1%, 1%, 1%; 
+    border-color: black; 
+    text-align: center; 
+    padding-left: 5%; 
+    padding-right: 5%;  
+    color: white;
+}
+.finder{
+    background-color: AliceBlue; 
+    margin-left: 2%; 
+    width: 95%;
+}
+
+.imgure{
+    height: min-content;
+    width: min-content; 
+    top: 0; 
+    left: 0; 
+    margin : 0; 
+    padding: 0; 
+    padding-left: 0%;
+}
+
+
+.features_of_good{
+    border-radius: 10px;
+    font-size: 0.65em;
+}
+
+.green_border{
+    border: 1px; 
+    border-color: #41AD0B;
+}
+
+.little_round{
+    border-radius: 20px;
+}
+
+.active{
+    color: #41AD0B;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 5px;
+    border-color: #41AD0B;
+    background-color: white;
+}
+
+.nonactive{
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
+    background-color: white;
+}
+
+.little_text{
+    font-size: 0.9em;
+}
+
+.good_picture{
+    width: 100%;
+    height: 70%
+}
+
+.very_little_text{
+    font-size: 0.7em;
+}
+
+.btn-success, .btn-success:hover, .btn-success:active, .btn-success:visited{
+    background-color: #41AD0B !important;
+}
+
+.little_image{
+    height: 20%;
+    width: 20%;
+}
+
+.white_text{
+    background-color: white!important;
+}
