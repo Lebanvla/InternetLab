@@ -50,7 +50,7 @@
     <?php
             
     ?>
-        <table class = "container table table-striped" style = >
+        <table class = "container table table-striped table-hover" style = >
             <tr class = "col-12">
             
             <th class = "col-2">Изображение</th>
