@@ -86,3 +86,8 @@ div.col-1{
 .white_text{
     background-color: white!important;
 }
+
+.table_picture{
+    height: 100px;
+    width: 100px;
+}
