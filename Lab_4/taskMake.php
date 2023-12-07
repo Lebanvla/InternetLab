@@ -91,11 +91,8 @@
         foreach ($wordList as $word) {
             if ($word === $prevWord) {
                 $repeatCount++;
-                if ($repeatCount == 2) {
-                    $text = str_replace($word, "<span style='background-color:yellow;'>$word</span>", $text);
-                } 
-                else if($repeatCount >= 2) {
-                    $text = str_replace($word, "<span style='background-color:yellow;'>$word</span>", $text);
+                if($repeatCount >= 2) {
+                    $text = str_replace(" ".$word." ", "<span style='background-color:yellow;'>"." ".$word." "."</span>", $text);
                 } 
             } else {
                 $repeatCount = 1;
