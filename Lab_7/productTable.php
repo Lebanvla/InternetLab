@@ -1,5 +1,28 @@
+<?php 
+    include 'PHP/dataBaseWork.php';
+    if(!isset($_POST["needBrands"]))
+        $_POST["needBrands"] = 0;
+?>
+<?php
+    if (isset($_POST["delete"])){
+        $name = $_POST["delete"];
+        try{
+            productTable::removeProductByName($name);
+        }catch(mysqli_sql_exception $ex){
+            logWriter($ex->getMessage());
+        }
+        header('Location: productTable.php');
+    }
+    else if(isset($_POST["change"])){
+        logWriter("In change");
+        setcookie("changed_product_name", $_POST["change"]);
+        header('Location: changeDataBase.php');
+    }
+    else{
+        logWriter("Нет post'а");
+    }
+?>
 <?php include 'PHP/header.php';?>
-<?php include 'PHP/dataBaseWork.php';?>
 
     <main class = "col-10 container text-center">
     <form action="productTable.php" method="get" name="typeOfQuery">
@@ -29,21 +52,30 @@
 
                 </tr>
                 <?php 
-                if(!isset($_GET) || $_GET["needBrands"] == 0){
+                if(!isset($_GET["needBrands"])){
                     $allProducts = productTable::getAllProducts();
                 }
                 else{
-                    $allProducts = productTable::getProductsByBrand($_GET["needBrands"]);
-                }
-                foreach ($allProducts as $row): ?>    
-                    <tr class = "col-12">
-                        <td class = "col-2"><img src="<?php echo htmlspecialchars("productpicture/".$row['image'].'.png')?>" width="115px" height="80px"></td>
-                        <td class = "col-2"><?php echo htmlspecialchars($row['productName']) ?></td>
-                        <td class = "col-2"><?php echo htmlspecialchars($row['brandName']) ?></td>
-                        <td class = "col-2"><?php echo htmlspecialchars($row['typeName']) ?></td>
-                        <td class = "col-2"><?php echo htmlspecialchars($row['price']) ?></td>
-                        <td class = "col-2"><?php echo htmlspecialchars(substr($row['description'],0,200)) ?></td>
-                    </tr>
+                    if($_GET["needBrands"] != 0)
+                        $allProducts = productTable::getProductsByBrand($_GET["needBrands"]);
+                    else $allProducts = productTable::getAllProducts();
+                }$count = 0;
+                foreach ($allProducts as $row): ?>
+                        <tr class = "col-12">
+                            <td class = "col-2"><img src="<?php echo htmlspecialchars("productpicture/".$row['image'].'.png')?>" width="115px" height="80px"></td>
+                            <td class = "col-1"><?php echo htmlspecialchars($row['productName']) ?></td>
+                            <td class = "col-1"><?php echo htmlspecialchars($row['brandName']) ?></td>
+                            <td class = "col-1"><?php echo htmlspecialchars($row['typeName']) ?></td>
+                            <td class = "col-1"><?php echo htmlspecialchars($row['price']) ?></td>
+                            <td class = "col-3"><?php echo htmlspecialchars(substr($row['description'],0,200)) ?></td>
+                            <td class = "col-2">
+                            <form>
+                                <button type="submit" formaction ="productTable.php" formmethod="post" class="btn btn-primary col-12" name = "change" id="change" value=<?php echo '"' . htmlspecialchars($row["productName"]). '"'?>> Изменить запись</button>
+                                <br>
+                                <button type="submit"  formaction ="productTable.php" formmethod="post" class="btn btn-danger col-12" name = "delete" id="delete" value=<?php echo '"' . htmlspecialchars($row["productName"]). '"'?>>Удалить запись</button>
+                            </form>
+                            </td>
+                        </tr>
                 <?php endforeach; ?>
             </table>
             <form action="productAdd.php" method="get">
@@ -53,4 +85,4 @@
             </form>
     </main>
     <br>
-<?php include 'PHP/footer.php'?>
+<?php include 'PHP/footer.php';?>

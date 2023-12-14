@@ -1,7 +1,7 @@
 <?php
     
     function logWriter(string $messange){
-        $fd = fopen("PHP/log.txt", 'a');
+        $fd = fopen($_SERVER['DOCUMENT_ROOT'] . '/InternetLab/Lab_7/' . "PHP/log.txt", 'a');
         fwrite($fd, $messange."\n");
         fclose($fd);
     }
@@ -53,7 +53,7 @@
 
     class productTable{
         public static function getAllProducts(){
-            $query = dataBase::prepare("select productName, image, brandName, typeName, price, description
+            $query = dataBase::prepare("select *
                                         from products
                                         join brands on products.chemicalBrand_ID = brands.brand_id
                                         join types on products.chemicalType_ID = types.typeId");
@@ -71,7 +71,7 @@
         }
 
         public static function getProductsByBrand(string $brand){
-            $query = dataBase::prepare("select productName, image, brandName, typeName, price, description
+            $query = dataBase::prepare("select *
                                         from products
                                         join brands on products.chemicalBrand_ID = brands.brand_id
                                         join types on products.chemicalType_ID = types.typeId
@@ -91,8 +91,27 @@
             return $output;
         }
 
+        public static function getProductByName(string $name){
+            $query = dataBase::prepare("select *
+                                        from products
+                                        where productName = ?");
+            
+            $query->bind_param("s", $name);
+            $query->execute();
+            $result = $query->get_result();
+            if(!$result){
+                throw new mysqli_sql_exception("При выводе продуктов по id произошла ошибка");
+            }
+            logWriter("Выполнили запрос по получению продуктов");
+            $output = array();
+            while($row = $result->fetch_assoc()) {
+                $output[] = $row;
+            }
+            return array_shift($output);
+        }
 
-        public static function addNewProduct(string $productName, $productPrice, $productImage, $productDescription, $productBrand, $productType){
+
+        public static function addNewProduct(string $productName, int $productPrice, string $productImage, string $productDescription, int $productBrand, int $productType){
             $query = dataBase::prepare("SELECT productName, price, image, description, chemicalType_ID, chemicalBrand_ID 
                                         from products where productName = ?");
             $query->bind_param("s", $productName);
@@ -110,7 +129,55 @@
                 }
             }
             else throw new mysqli_sql_exception("Уже существует такой продукт");
-        
+    }
 
+
+    public static function removeProductByName(string $name){
+        $query = dataBase::prepare("select image from products where productName = ?");
+        if(!$query->bind_param("s", $name)){
+            throw new mysqli_sql_exception("При введении параметров произошла ошибка");
+        }
+        logWriter("Подготовка параметров 1 закончилась успешно");
+        if(!$query->execute()){
+            throw new mysqli_sql_exception("При поиске продукта произошла ошибка");
+        }
+        logWriter("Поиск продукта 1 закончился успешно");
+        $imageName = $_SERVER['DOCUMENT_ROOT'] . '/InternetLab/Lab_7/productpicture/' . $query->get_result()->fetch_array()["image"].".png";
+        if(!unlink($imageName)){
+            throw new mysqli_sql_exception("При удалении картинки произошла ошибка");
+        }
+        logWriter("Удаление картинки успешно");
+        $query = dataBase::prepare("delete from products where productName = ?");
+        if(!$query->bind_param("s", $name)){
+            throw new mysqli_sql_exception("При введении параметров произошла ошибка");
+        }
+        logWriter("Подготовка параметров 2 закончилась успешно");
+        if(!$query->execute()){
+            throw new mysqli_sql_exception("При удалении продукта произошла ошибка");
+        }
+        logWriter("Удаление продукта успешно");
+    }
+
+
+    public static function changeProductByName(string $productName, string $newProductName, int $newProductPrice, string $newProductImage, string $newProductDescription, int $newProductBrand, int $newProductType){
+        $query = dataBase::prepare("select productName, image from products where productName = ?");
+        if(!$query->bind_param("s", $productName)){
+            throw new mysqli_sql_exception("При 1 введении параметров произошла ошибка");
+        }
+        if(!$query->execute()){
+            throw new mysqli_sql_exception("При поиске продукта произошла ошибка");
+        }
+        $result = $query->get_result();
+
+        if($result->num_rows == 0){
+            throw new mysqli_sql_exception("Такого продукта нет в базе");
+        }
+        else{
+            $query = dataBase::prepare("update products
+                                        SET productName=?, price=?, image=?, description=?, chemicalType_ID=?, chemicalBrand_ID=? 
+                                        where productName=?");
+            $query->bind_param("sissiis", $newProductName, $newProductPrice, $newProductImage, $newProductDescription, $newProductType, $newProductBrand, $productName);
+            $query->execute();
+        }
     }
 }

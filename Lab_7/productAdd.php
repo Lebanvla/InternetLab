@@ -18,13 +18,15 @@
             {
                 logWriter("Файл не создан");
             }
-            $fileName = pathinfo($uploadDir . $file['name'], PATHINFO_FILENAME);
-            try{
-            productTable::addNewProduct($name, $price, $fileName, $description, $brand, $type);
-            }catch(mysqli_sql_exception $ex){
-                logWriter($ex->getMessage());
-            }
-            header('Location: productTable.php');
+            else{
+                $fileName = pathinfo($uploadDir . $file['name'], PATHINFO_FILENAME);
+                try{
+                productTable::addNewProduct($name, $price, $fileName, $description, $brand, $type);
+                }catch(mysqli_sql_exception $ex){
+                    logWriter($ex->getMessage());
+                }
+                header('Location: productTable.php');
+        }
         }
         else logWriter("Ошибка ввода данных\n Переменные: \n" . (isset($name) ? $name : "Имя пусто ").  (($price) ? $price : "Цена пуста "). ($brand? $brand : "Брэнд пуст") . ($type? $type : "Брэнд пуст") . (isset($description) ? $description : "Описание пусто "));
     }
