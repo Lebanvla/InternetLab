@@ -13,11 +13,6 @@
         }
         header('Location: productTable.php');
     }
-    else if(isset($_POST["change"])){
-        logWriter("In change");
-        setcookie("changed_product_name", $_POST["change"]);
-        header('Location: changeDataBase.php');
-    }
     else{
         logWriter("Нет post'а");
     }
@@ -48,6 +43,7 @@
                 <th class = "col-2">Вид химии</th>
                 <th class = "col-2">Цена</th>
                 <th class = "col-2">Описание товара</th>
+                <th class = "col-2">Кнопки</th>
                 
 
                 </tr>
@@ -70,8 +66,8 @@
                             <td class = "col-3"><?php echo htmlspecialchars(substr($row['description'],0,200)) ?></td>
                             <td class = "col-2">
                             <form>
-                                <button type="submit" formaction ="productTable.php" formmethod="post" class="btn btn-primary col-12" name = "change" id="change" value=<?php echo '"' . htmlspecialchars($row["productName"]). '"'?>> Изменить запись</button>
-                                <br>
+                                <a href=<?php echo "changeDataBase.php?productName=".str_replace(" ", "+", $row['productName'])?> class="btn btn-primary col-12" role="button">Изменить запись</a>
+                                <br><br>
                                 <button type="submit"  formaction ="productTable.php" formmethod="post" class="btn btn-danger col-12" name = "delete" id="delete" value=<?php echo '"' . htmlspecialchars($row["productName"]). '"'?>>Удалить запись</button>
                             </form>
                             </td>

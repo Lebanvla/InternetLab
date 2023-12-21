@@ -1,10 +1,8 @@
 <?php
     include("PHP/dataBaseWork.php");
 
-    if(isset($_COOKIE["changed_product_name"])){
-        $oldProductName = $_COOKIE["changed_product_name"];
-        unset($_COOKIE['changed_product_name']);
-        setcookie('changed_product_name', null, time()-3600);
+    if(isset($_GET["productName"])){
+        $oldProductName = $_GET["productName"];
         include ("PHP/header.php");
         $productData = productTable::getProductByName($oldProductName);
         ?>

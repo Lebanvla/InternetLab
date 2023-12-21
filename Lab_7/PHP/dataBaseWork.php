@@ -47,6 +47,10 @@
             logWriter("Подготовили запрос");
             return static::getLink()->prepare($query);
         }
+
+        public static function query(string $query){
+            return static::getLink()->query($query);
+        }
 }
 
 
@@ -117,11 +121,17 @@
             $query->bind_param("s", $productName);
             $query->execute();
             $result = $query->get_result();
+            logWriter("Выполнил запрос по получению продукта");
             if($result->num_rows == 0){
+                $query = dataBase::query("SELECT MAX(id_product) from products");
+                logWriter("Получил макисмальный id продукта");
+                $result = $query->fetch_assoc();
+                $productID = $result["MAX(id_product)"] + 1;
+                logWriter("ID продукта ". $productID." - ". $productID["MAX(id_product)"]);
                 $query = dataBase::prepare("INSERT into autochemical.products 
-                                            (productName, price, image, description, chemicalType_ID, chemicalBrand_ID)
-                                            VALUES (?, ?, ?, ?, ?, ?)");
-                if(!$query->bind_param("sissii", $productName, $productPrice, $productImage, $productDescription, $productType, $productBrand)){
+                                            (id_product, productName, price, image, description, chemicalType_ID, chemicalBrand_ID)
+                                            VALUES (?, ?, ?, ?, ?, ?, ?)");
+                if(!$query->bind_param("isissii", $productID, $productName, $productPrice, $productImage, $productDescription, $productType, $productBrand)){
                     throw new mysqli_sql_exception("При введении параметров произошла ошибка");
                 }
                 if(!$query->execute()){
@@ -132,52 +142,53 @@
     }
 
 
-    public static function removeProductByName(string $name){
-        $query = dataBase::prepare("select image from products where productName = ?");
-        if(!$query->bind_param("s", $name)){
-            throw new mysqli_sql_exception("При введении параметров произошла ошибка");
+        public static function removeProductByName(string $name){
+            $query = dataBase::prepare("select image from products where productName = ?");
+            if(!$query->bind_param("s", $name)){
+                throw new mysqli_sql_exception("При введении параметров произошла ошибка");
+            }
+            logWriter("Подготовка параметров 1 закончилась успешно");
+            if(!$query->execute()){
+                throw new mysqli_sql_exception("При поиске продукта произошла ошибка");
+            }
+            logWriter("Поиск продукта 1 закончился успешно");
+            $imageName = $_SERVER['DOCUMENT_ROOT'] . '/InternetLab/Lab_7/productpicture/' . $query->get_result()->fetch_array()["image"].".png";
+            
+            if(file_exists($imageName) && !unlink($imageName)){
+                throw new mysqli_sql_exception("При удалении картинки произошла ошибка");
+            }
+            logWriter("Удаление картинки успешно");
+            $query = dataBase::prepare("delete from products where productName = ?");
+            if(!$query->bind_param("s", $name)){
+                throw new mysqli_sql_exception("При введении параметров произошла ошибка");
+            }
+            logWriter("Подготовка параметров 2 закончилась успешно");
+            if(!$query->execute()){
+                throw new mysqli_sql_exception("При удалении продукта произошла ошибка");
+            }
+            logWriter("Удаление продукта успешно");
         }
-        logWriter("Подготовка параметров 1 закончилась успешно");
-        if(!$query->execute()){
-            throw new mysqli_sql_exception("При поиске продукта произошла ошибка");
-        }
-        logWriter("Поиск продукта 1 закончился успешно");
-        $imageName = $_SERVER['DOCUMENT_ROOT'] . '/InternetLab/Lab_7/productpicture/' . $query->get_result()->fetch_array()["image"].".png";
-        if(!unlink($imageName)){
-            throw new mysqli_sql_exception("При удалении картинки произошла ошибка");
-        }
-        logWriter("Удаление картинки успешно");
-        $query = dataBase::prepare("delete from products where productName = ?");
-        if(!$query->bind_param("s", $name)){
-            throw new mysqli_sql_exception("При введении параметров произошла ошибка");
-        }
-        logWriter("Подготовка параметров 2 закончилась успешно");
-        if(!$query->execute()){
-            throw new mysqli_sql_exception("При удалении продукта произошла ошибка");
-        }
-        logWriter("Удаление продукта успешно");
-    }
 
 
-    public static function changeProductByName(string $productName, string $newProductName, int $newProductPrice, string $newProductImage, string $newProductDescription, int $newProductBrand, int $newProductType){
-        $query = dataBase::prepare("select productName, image from products where productName = ?");
-        if(!$query->bind_param("s", $productName)){
-            throw new mysqli_sql_exception("При 1 введении параметров произошла ошибка");
-        }
-        if(!$query->execute()){
-            throw new mysqli_sql_exception("При поиске продукта произошла ошибка");
-        }
-        $result = $query->get_result();
+        public static function changeProductByName(string $productName, string $newProductName, int $newProductPrice, string $newProductImage, string $newProductDescription, int $newProductBrand, int $newProductType){
+            $query = dataBase::prepare("select productName, image from products where productName = ?");
+            if(!$query->bind_param("s", $productName)){
+                throw new mysqli_sql_exception("При 1 введении параметров произошла ошибка");
+            }
+            if(!$query->execute()){
+                throw new mysqli_sql_exception("При поиске продукта произошла ошибка");
+            }
+            $result = $query->get_result();
 
-        if($result->num_rows == 0){
-            throw new mysqli_sql_exception("Такого продукта нет в базе");
+            if($result->num_rows == 0){
+                throw new mysqli_sql_exception("Такого продукта нет в базе");
+            }
+            else{
+                $query = dataBase::prepare("update products
+                                            SET productName=?, price=?, image=?, description=?, chemicalType_ID=?, chemicalBrand_ID=? 
+                                            where productName=?");
+                $query->bind_param("sissiis", $newProductName, $newProductPrice, $newProductImage, $newProductDescription, $newProductType, $newProductBrand, $productName);
+                $query->execute();
+            }
         }
-        else{
-            $query = dataBase::prepare("update products
-                                        SET productName=?, price=?, image=?, description=?, chemicalType_ID=?, chemicalBrand_ID=? 
-                                        where productName=?");
-            $query->bind_param("sissiis", $newProductName, $newProductPrice, $newProductImage, $newProductDescription, $newProductType, $newProductBrand, $productName);
-            $query->execute();
-        }
-    }
 }
