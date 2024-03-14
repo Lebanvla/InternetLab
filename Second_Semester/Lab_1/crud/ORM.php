@@ -6,6 +6,7 @@ include("../core/DataBase.php");
 
 abstract class ORM
 {
+    abstract protected function getTypes();
     protected function mysqliresult_to_array(mysqli_result $result): array|null
     {
         $returningVal = [];
@@ -28,6 +29,28 @@ abstract class ORM
         }
     }
 
+
+    public function updateRecord($AttributeValueArray)
+    {
+        $fields = array_keys($this->getTableFields());
+        $sql = "update " . $this->getTableName() . " SET ";
+        $values = [];
+        foreach ($fields as $field) {
+            if ($field === $this->idName() || !isset($AttributeValueArray[$field]))
+                continue;
+            $sql = $sql . $field . " = ?, ";
+            $values[] = $AttributeValueArray[$field];
+        }
+        $sql = substr($sql, 0, -2) . substr($sql, -1);
+        $sql = $sql . " where {$this->idName()} = ?";
+        $sql = substr($sql, 0, -2) . substr($sql, -1);
+        $values[] = $AttributeValueArray[$this->idName()];
+        $query = DataBase::prepare($sql);
+        echo $sql;
+        $query->bind_param($this->getTypes(), ...$values);
+        $query->execute();
+    }
+
     abstract public function createRow(array $Values);
 
     abstract protected function getTableName(): string;
@@ -47,6 +70,13 @@ abstract class ORM
         $query = DataBase::prepare("delete from {$this->getTableName()} where {$this->idName()} = ?");
         $query->bind_param("i", $id);
         $query->execute();
+    }
+    public function getRecordByID(int $id)
+    {
+        $query = DataBase::prepare("select * from {$this->getTableName()} where {$this->idName()} = ?");
+        $query->bind_param("i", $id);
+        $query->execute();
+        return $this->mysqliresult_to_array($query->get_result())[0];
     }
 }
 
@@ -121,6 +151,10 @@ class Product extends ORM
             "description" => "str"
         ];
     }
+    protected function getTypes()
+    {
+        return "ssiiisi";
+    }
 
     protected function idName(): string
     {
@@ -153,7 +187,7 @@ class Brand extends ORM
     function getTableFields(): array
     {
         return [
-            "id" => "int",
+            "brand_id" => "int",
             "brand_name" => "str",
         ];
     }
@@ -167,6 +201,10 @@ class Brand extends ORM
     {
         return "brand_id";
     }
+    protected function getTypes()
+    {
+        return "si";
+    }
 }
 
 class Type extends ORM
@@ -174,6 +212,10 @@ class Type extends ORM
     public function createRow(array $Values)
     {
 
+    }
+    protected function getTypes()
+    {
+        return "is";
     }
 
     function getTableName(): string

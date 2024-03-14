@@ -130,7 +130,6 @@ if (isset($_GET["action"])) {
                     header("Location: http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=brand&action=read_all");
                     die();
                 } else {
-                    var_dump($rows);
                     header("Location: http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=brand&action=delete_dict&id=" . $_GET["id"]);
                     die();
                 }
@@ -139,15 +138,19 @@ if (isset($_GET["action"])) {
 
         }
 
-
     } else if ($_GET["action"] == "delete_dict") {
         include("../core/header.php");
         ?>
                 <div class="tect-center">
                     Вы уверены, что хотите удалить этот бренд вместе со всеми продутами? Если да, то
+                    <form action="http://localhost/InternetLab/Second_Semester/Lab_1/crud/" method="post">
+                        <button type="submit" class="btn btn-link">нажмите
+                            сюда</button>
+                        <input type="hidden" name="id" value=<?php echo $_GET["id"] ?>>
+                        <input type="hidden" name="endingDelete" value="ok">
+                    </form>
                     <a
-                        href="http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=brand&action=delete_dict_with_data&id=<?= $_GET["id"] ?>">нажмите
-                        сюда</a>
+                        href="http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=brand&action=delete_dict_with_data&id=<?= $_GET["id"] ?>"></a>
                     иначе, если хотите изменить продукты, входящие в него
                     <a
                         href="http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=product&action=read_by_brand&brand=<?= $_GET["id"] ?>">нажмите
@@ -256,7 +259,90 @@ if (isset($_GET["action"])) {
         }
         include("../core/footer.php");
 
+    } else if ($_GET["action"] == "change") {
+        include("../core/header.php");
+        if ($_GET["type"] == "product") {
+            $changedProduct = $typingORM->getRecordByID($_GET["id"]);
+            ?>
+                                <form name="product_create" action="http://localhost/InternetLab/Second_Semester/Lab_1/crud/" method="post">
+                                    <div class="mb-3">
+                                        <label for="productName" class="form-label">Название продукта</label>
+                                        <input type="text" class="form-control" name="productName" aria-describedby="nameHelp"
+                                            value=<?= $changedProduct["productName"] ?>>
+                                        <div id="nameHelp" class="form-text">Введите название продукта
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="image" class="form-label">Изображение продукта</label>
+                                        <input type="text" class="form-control" name="image" aria-describedby="imageHelp"
+                                            value=<?= $changedProduct["image"] ?>>
+                                        <div id="imageHelp" class="form-text">Введите изображение продукта</div>
+                                    </div>
+
+                                    <label for="price" class="form-label">Выберите бренд</label>
+                                    <select class="form-select" aria-label="Выберите тип" name="brand">
+                        <?php
+                        $brands = ORM::fabric("brand")->readAllRecords();
+                        for ($i = 0; $i < count($brands); $i++) {
+                            echo ("<option value={$brands[$i]["brand_id"]}>{$brands[$i]["brand_name"]}" .
+                                ($brands[$i]["brand_id"] == $$changedProduct["chemicalBrandID"] ? "selected" : "")
+                                . "</option>");
+                        }
+                        ?>
+                                    </select>
+                                    <label for="price" class="form-label">Выберите тип</label>
+                                    <select class="form-select" aria-label="Выберите тип" name="product_type">
+                        <?php
+                        $brands = ORM::fabric("type")->readAllRecords();
+                        for ($i = 0; $i < count($brands); $i++) {
+                            echo ("<option value={$brands[$i]["typeID"]}" .
+                                ($brands[$i]["typeID"] == $$changedProduct["chemicalTypeID"] ? "selected" : "")
+                                . ">{$brands[$i]["typeName"]}</option>");
+                        }
+                        ?>
+                                    </select>
+
+                                    <div class="mb-3">
+                                        <label for="price" class="form-label">Цена продукта</label>
+                                        <input type="number" class="form-control" name="price" aria-describedby="priceHelp"
+                                            value=<?= $changedProduct["price"] ?>>
+                                        <div id="priceHelp" class="form-text">Введите цену продукта</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label">Введите описание продукта</label>
+                                        <input type="text" class="form-control" name="description" aria-describedby="imageHelp"
+                                            value=<?= $changedProduct["description"] ?>>
+                                        <div id="imageHelp" class="form-text">Введите описание продукта</div>
+                                    </div>
+                                    <input type="hidden" name="product_update" value="product_update" />
+
+                                    <input type="hidden" name="id" value=<?= $_GET["id"] ?> />
+                                    <button type="submit" class="btn btn-primary">Отправить</button>
+                                </form>
+
+            <?php
+        } else if ($_GET["type"] == "brand") {
+            $changedBrand = $typingORM->getRecordByID($_GET["id"]);
+
+            ?>
+                                    <form name="product_create" action="http://localhost/InternetLab/Second_Semester/Lab_1/crud/" method="post">
+                                        <div class="mb-3">
+                                            <label for="brandName" class="form-label">Название бренда</label>
+                                            <input type="text" class="form-control" name="brand_name" aria-describedby="nameHelp"
+                                                value=<?= $changedBrand["brand_name"] ?>>
+                                            <div id="nameHelp" class="form-text">Введите название бренда</div>
+                                        </div>
+                                        <input type="hidden" name="brand_update" value="brand_update" />
+                                        <button type="submit" class="btn btn-primary">Отправить</button>
+
+                                        <input type="hidden" name="brand_id" value=<?= $_GET["id"] ?> />
+                                    </form>
+            <?php
+        }
+        include("../core/footer.php");
+
     }
+
 } else if (isset($_POST["form"])) {
     $typingORM = ORM::fabric($_POST["form"]);
     if ($_POST["form"] == "product") {
@@ -299,9 +385,11 @@ if (isset($_GET["action"])) {
             header("Location: http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=brand&action=create&isagain=1");
     }
 } else if (isset($_POST["type"])) {
+    $typingORM = ORM::fabric("brand");
     var_dump($_POST["type"]);
     switch ($_POST["type"]) {
         case "delete_product":
+            $typingORM = ORM::fabric("product");
             echo ("here");
             $typingORM->deleteRecordByID($_POST["id"]);
             header("Location: http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=product&action=read_all");
@@ -315,17 +403,55 @@ if (isset($_GET["action"])) {
                 ]
             ]);
             if (is_null($rows)) {
-                $typingORM->deleteRecordByID($_GET["id"]);
+                $typingORM->deleteRecordByID($_POST["id"]);
                 header("Location: http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=brand&action=read_all");
                 die();
             } else {
                 var_dump($rows);
-                header("Location: http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=brand&action=delete_dict&id=" . $_GET["id"]);
+                header("Location: http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=brand&action=delete_dict&id=" . $_POST["id"]);
                 die();
             }
             ;
 
     }
+} else if (isset($_POST["endingDelete"])) {
+
+    $typingORM = ORM::fabric("brand");
+    $typingORM->deleteRecordByID($_POST["id"]);
+    header("Location: http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=brand&action=read_all");
+    die();
+} else if (isset($_POST["product_update"])) {
+    $typingORM = ORM::fabric("product");
+    $errors = [];
+    if (!ctype_digit($_POST["price"])) {
+        $errors["price"] = true;
+    }
+    if (!ctype_digit($_POST["product_type"])) {
+        $errors["product_type"] = true;
+    }
+    if (!ctype_digit($_POST["brand"]))
+        $errors["brand"] = true;
+
+    $typingORM->updateRecord([
+        "productName" => $_POST["productName"],
+        "image" => $_POST["image"],
+        "chemicalBrandID" => $_POST["brand"],
+        "chemicalTypeID" => $_POST["product_type"],
+        "price" => $_POST["price"],
+        "description" => $_POST["description"],
+        "id" => $_POST["id"]
+    ]);
+    header("Location: http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=product&action=read_all");
+} else if (isset($_POST["brand_update"])) {
+    $typingORM = ORM::fabric("brand");
+    $errors = [];
+
+    $typingORM->updateRecord([
+        "brand_name" => $_POST["brand_name"],
+        "brand_id" => (int) $_POST["brand_id"],
+    ]);
+    header("Location: http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=brand&action=read_all");
+
 }
 
 ?>
