@@ -1,6 +1,6 @@
 <?php
-include("ORM.php");
-include("../view/table.php");
+include ("ORM.php");
+include ("../view/table.php");
 
 
 /*
@@ -9,7 +9,7 @@ INSERT INTO `brands` (`brand_id`, `brand_name`) VALUES ('2', 'test_brend2');
 INSERT INTO `products` (`id`, `image`, `productName`, `chemicalTypeID`, `chemicalBrandID`, `price`, `description`) VALUES ('0', 'Grass_Icon', 'saadfgh', '2', '1', '12', 'asdfsadfv');
 */
 
-if (isset($_GET["action"])) {
+if (isset ($_GET["action"])) {
     $typingORM = ORM::fabric($_GET["type"]);
     if ($_GET["action"] === "read_all" || $_GET["action"] == "read_by_brand") {
         $result = $_GET["action"] == "read_all" ? $typingORM->readAllRecords() :
@@ -45,7 +45,7 @@ if (isset($_GET["action"])) {
                     7 => ["name" => "delete", "type" => "form_button",],
 
                 ];
-                if (!isset($result)) {
+                if (!isset ($result)) {
                     $result = [];
                 }
                 for ($index = 0; $index < count($result); $index++) {
@@ -76,7 +76,7 @@ if (isset($_GET["action"])) {
                     2 => ["name" => "change", "type" => "link"],
                     3 => ["name" => "delete", "type" => "form_button",],
                 ];
-                if (!isset($result)) {
+                if (!isset ($result)) {
                     $result = [];
                 }
                 for ($index = 0; $index < count($result); $index++) {
@@ -99,7 +99,7 @@ if (isset($_GET["action"])) {
             default:
                 throw new Exception("Invalid ORM type");
         }
-        include("../core/header.php");
+        include ("../core/header.php");
         echo MakeTableByData($result, $types, $headers);
         ?>
         <a class="btn btn-info" role="button"
@@ -107,16 +107,12 @@ if (isset($_GET["action"])) {
             Создать запись
         </a>
         <?php
-        include("../core/footer.php");
+        include ("../core/footer.php");
 
 
 
-    } else if ($_GET["action"] == "delete" && isset($_GET["id"])) {
+    } else if ($_GET["action"] == "delete" && isset ($_GET["id"])) {
         switch ($_GET["type"]) {
-            case "product":
-                $typingORM->deleteRecordByID($_GET["id"]);
-                header("Location: http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=product&action=read_all");
-                die();
             case "brand":
                 $productORM = ORM::fabric("product");
                 $rows = $productORM->getRowByAttribute([
@@ -139,7 +135,7 @@ if (isset($_GET["action"])) {
         }
 
     } else if ($_GET["action"] == "delete_dict") {
-        include("../core/header.php");
+        include ("../core/header.php");
         ?>
                 <div class="tect-center">
                     Вы уверены, что хотите удалить этот бренд вместе со всеми продутами? Если да, то
@@ -161,30 +157,32 @@ if (isset($_GET["action"])) {
                     </a>
                 </div>
             <?php
-            include("../core/footer.php");
+            include ("../core/footer.php");
 
     } else if ($_GET["action"] == "delete_dict_with_data") {
         $typingORM->deleteRecordByID($_GET["id"]);
         header("Location: http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=brand&action=read_all");
         die();
     } else if ($_GET["action"] == "create") {
-        include("../core/header.php");
+        include ("../core/header.php");
         if ($_GET["type"] == "product") {
             ?>
-                            <form name="product_create" action="http://localhost/InternetLab/Second_Semester/Lab_1/crud/" method="post">
+                            <form name="product_create" enctype="multipart/form-data"
+                                action="http://localhost/InternetLab/Second_Semester/Lab_1/crud/" method="post">
                                 <div class="mb-3">
                                     <label for="productName" class="form-label">Название продукта</label>
-                                    <input type="text" class="form-control" name="productName" aria-describedby="nameHelp" <?php
-                                    if (isset($_GET["isagain"]) && isset($_GET["productName"])) {
-                                        echo ("value = {$_GET["productName"]})");
-                                    }
-                                    ?>>
+                                    <input required pattern="^(?![\s.,!<>\/-]+$)[a-zа-яА-ЯA-Z0-9]+$" type="text" class="form-control"
+                                        name="productName" aria-describedby="nameHelp" <?php
+                                        if (isset ($_GET["isagain"]) && isset ($_GET["productName"])) {
+                                            echo ("value = {$_GET["productName"]})");
+                                        }
+                                        ?>>
                                     <div id="nameHelp" class="form-text">Введите название продукта</div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="image" class="form-label">Изображение продукта</label>
-                                    <input type="text" class="form-control" name="image" aria-describedby="imageHelp" <?php
-                                    if (isset($_GET["isagain"]) && isset($_GET["image"])) {
+                                    <input required type="file" class="form-control" name="image" aria-describedby="imageHelp" <?php
+                                    if (isset ($_GET["isagain"]) && isset ($_GET["image"])) {
                                         echo ("value = {$_GET["image"]})");
                                     }
                                     ?>>
@@ -192,23 +190,23 @@ if (isset($_GET["action"])) {
                                 </div>
 
                                 <label for="price" class="form-label">Выберите бренд</label>
-                                <select class="form-select" aria-label="Выберите тип" name="brand">
+                                <select required class="form-select" aria-label="Выберите тип" name="brand">
                         <?php
                         $brands = ORM::fabric("brand")->readAllRecords();
                         for ($i = 0; $i < count($brands); $i++) {
                             echo ("<option value={$brands[$i]["brand_id"]}>{$brands[$i]["brand_name"]}" .
-                                (isset($_GET["isagain"]) && $brands[$i]["brand_id"] == $_GET["chemicalBrandID"] ? "selected" : "")
+                                (isset ($_GET["isagain"]) && $brands[$i]["brand_id"] == $_GET["chemicalBrandID"] ? "selected" : "")
                                 . "</option>");
                         }
                         ?>
                                 </select>
                                 <label for="price" class="form-label">Выберите тип</label>
-                                <select class="form-select" aria-label="Выберите тип" name="type">
+                                <select required class="form-select" aria-label="Выберите тип" name="type">
                         <?php
                         $brands = ORM::fabric("type")->readAllRecords();
                         for ($i = 0; $i < count($brands); $i++) {
                             echo ("<option value={$brands[$i]["typeID"]}" .
-                                (isset($_GET["isagain"]) && $brands[$i]["typeID"] == $_GET["chemicalTypeID"] ? "selected" : "")
+                                (isset ($_GET["isagain"]) && $brands[$i]["typeID"] == $_GET["chemicalTypeID"] ? "selected" : "")
                                 . ">{$brands[$i]["typeName"]}</option>");
                         }
                         ?>
@@ -216,8 +214,8 @@ if (isset($_GET["action"])) {
 
                                 <div class="mb-3">
                                     <label for="price" class="form-label">Цена продукта</label>
-                                    <input type="number" class="form-control" name="price" aria-describedby="priceHelp" <?php
-                                    if (isset($_GET["isagain"]) && isset($_GET["price"])) {
+                                    <input required type="number" class="form-control" name="price" aria-describedby="priceHelp" <?php
+                                    if (isset ($_GET["isagain"]) && isset ($_GET["price"])) {
                                         echo ("value = {$_GET["price"]})");
                                     }
                                     ?>>
@@ -225,11 +223,12 @@ if (isset($_GET["action"])) {
                                 </div>
                                 <div class="mb-3">
                                     <label for="description" class="form-label">Введите описание продукта</label>
-                                    <input type="text" class="form-control" name="description" aria-describedby="imageHelp" <?php
-                                    if (isset($_GET["isagain"]) && isset($_GET["description"])) {
-                                        echo ("value = {$_GET["description"]})");
-                                    }
-                                    ?>>
+                                    <input required pattern="^(?![\s.,!<>\/-]+$)[a-zа-яА-ЯA-Z0-9]+$" type="text" class="form-control"
+                                        name="description" aria-describedby="imageHelp" <?php
+                                        if (isset ($_GET["isagain"]) && isset ($_GET["description"])) {
+                                            echo ("value = {$_GET["description"]})");
+                                        }
+                                        ?>>
                                     <div id="imageHelp" class="form-text">Введите описание продукта</div>
                                 </div>
                                 <input type="hidden" name="form" value="product" />
@@ -244,11 +243,12 @@ if (isset($_GET["action"])) {
                                 <form name="product_create" action="http://localhost/InternetLab/Second_Semester/Lab_1/crud/" method="post">
                                     <div class="mb-3">
                                         <label for="brandName" class="form-label">Название бренда</label>
-                                        <input type="text" class="form-control" name="brandName" aria-describedby="nameHelp" <?php
-                                        if (isset($_GET["isagain"]) && isset($_GET["brandName"])) {
-                                            echo ("value = {$_GET["brandName"]})");
-                                        }
-                                        ?>>
+                                        <input required pattern="^(?![\s.,!<>\/-]+$)[a-zа-яА-ЯA-Z0-9]+$" type="text" class="form-control"
+                                            name="brandName" aria-describedby="nameHelp" <?php
+                                            if (isset ($_GET["isagain"]) && isset ($_GET["brandName"])) {
+                                                echo ("value = {$_GET["brandName"]})");
+                                            }
+                                            ?>>
                                         <div id="nameHelp" class="form-text">Введите название бренда</div>
                                     </div>
                                     <input type="hidden" name="form" value="brand" />
@@ -257,30 +257,31 @@ if (isset($_GET["action"])) {
                                 </form>
             <?php
         }
-        include("../core/footer.php");
+        include ("../core/footer.php");
 
     } else if ($_GET["action"] == "change") {
-        include("../core/header.php");
+        include ("../core/header.php");
         if ($_GET["type"] == "product") {
             $changedProduct = $typingORM->getRecordByID($_GET["id"]);
             ?>
-                                <form name="product_create" action="http://localhost/InternetLab/Second_Semester/Lab_1/crud/" method="post">
+                                <form name="product_create" enctype="multipart/form-data"
+                                    action="http://localhost/InternetLab/Second_Semester/Lab_1/crud/" method="post">
                                     <div class="mb-3">
                                         <label for="productName" class="form-label">Название продукта</label>
-                                        <input type="text" class="form-control" name="productName" aria-describedby="nameHelp"
-                                            value=<?= $changedProduct["productName"] ?>>
+                                        <input required pattern="^(?![\s.,!<>\/-]+$)[a-zа-яА-ЯA-Z0-9]+$" type="text" class="form-control"
+                                            name="productName" aria-describedby="nameHelp" value=<?= htmlspecialchars($changedProduct["productName"]) ?>>
                                         <div id="nameHelp" class="form-text">Введите название продукта
                                         </div>
                                     </div>
                                     <div class="mb-3">
                                         <label for="image" class="form-label">Изображение продукта</label>
-                                        <input type="text" class="form-control" name="image" aria-describedby="imageHelp"
+                                        <input type="file" class="form-control" name="image" aria-describedby="imageHelp"
                                             value=<?= $changedProduct["image"] ?>>
                                         <div id="imageHelp" class="form-text">Введите изображение продукта</div>
                                     </div>
 
                                     <label for="price" class="form-label">Выберите бренд</label>
-                                    <select class="form-select" aria-label="Выберите тип" name="brand">
+                                    <select required class="form-select" aria-label="Выберите тип" name="brand">
                         <?php
                         $brands = ORM::fabric("brand")->readAllRecords();
                         for ($i = 0; $i < count($brands); $i++) {
@@ -291,7 +292,7 @@ if (isset($_GET["action"])) {
                         ?>
                                     </select>
                                     <label for="price" class="form-label">Выберите тип</label>
-                                    <select class="form-select" aria-label="Выберите тип" name="product_type">
+                                    <select required class="form-select" aria-label="Выберите тип" name="product_type">
                         <?php
                         $brands = ORM::fabric("type")->readAllRecords();
                         for ($i = 0; $i < count($brands); $i++) {
@@ -304,14 +305,14 @@ if (isset($_GET["action"])) {
 
                                     <div class="mb-3">
                                         <label for="price" class="form-label">Цена продукта</label>
-                                        <input type="number" class="form-control" name="price" aria-describedby="priceHelp"
+                                        <input required type="number" class="form-control" name="price" aria-describedby="priceHelp"
                                             value=<?= $changedProduct["price"] ?>>
                                         <div id="priceHelp" class="form-text">Введите цену продукта</div>
                                     </div>
                                     <div class="mb-3">
                                         <label for="description" class="form-label">Введите описание продукта</label>
-                                        <input type="text" class="form-control" name="description" aria-describedby="imageHelp"
-                                            value=<?= $changedProduct["description"] ?>>
+                                        <input required pattern="^(?![\s.,!<>\/-]+$)[a-zа-яА-ЯA-Z0-9]+$" type="text" class="form-control" name="description"
+                                            aria-describedby="imageHelp" value=<?= htmlspecialchars($changedProduct["description"]) ?>>
                                         <div id="imageHelp" class="form-text">Введите описание продукта</div>
                                     </div>
                                     <input type="hidden" name="product_update" value="product_update" />
@@ -328,8 +329,8 @@ if (isset($_GET["action"])) {
                                     <form name="product_create" action="http://localhost/InternetLab/Second_Semester/Lab_1/crud/" method="post">
                                         <div class="mb-3">
                                             <label for="brandName" class="form-label">Название бренда</label>
-                                            <input type="text" class="form-control" name="brand_name" aria-describedby="nameHelp"
-                                                value=<?= $changedBrand["brand_name"] ?>>
+                                            <input required pattern="^(?![\s.,!<>\/-]+$)[a-zа-яА-ЯA-Z0-9]+$" type="text" class="form-control"
+                                                name="brand_name" aria-describedby="nameHelp" value=<?= $changedBrand["brand_name"] ?>>
                                             <div id="nameHelp" class="form-text">Введите название бренда</div>
                                         </div>
                                         <input type="hidden" name="brand_update" value="brand_update" />
@@ -339,11 +340,11 @@ if (isset($_GET["action"])) {
                                     </form>
             <?php
         }
-        include("../core/footer.php");
+        include ("../core/footer.php");
 
     }
 
-} else if (isset($_POST["form"])) {
+} else if (isset ($_POST["form"])) {
     $typingORM = ORM::fabric($_POST["form"]);
     if ($_POST["form"] == "product") {
         $errors = [];
@@ -355,10 +356,29 @@ if (isset($_GET["action"])) {
         }
         if (!ctype_digit($_POST["brand"]))
             $errors["brand"] = true;
+        $_POST["productName"] = trim($_POST["productName"]);
+        $_POST["description"] = trim($_POST["description"]);
+
+        $newPictureName = "";
+        if (!empty ($_FILES["image"])) {
+            $image = $_FILES["image"];
+            if ($image["error"] !== UPLOAD_ERR_OK) {
+                throw new Exception("Ошибка ввода файла");
+            } else {
+                $tmpName = $image["tmp_name"];
+                $newPictureName = md5(file_get_contents($_FILES['image']['tmp_name'])) . ".png";
+                $success = move_uploaded_file($tmpName, $_SERVER["DOCUMENT_ROOT"] . "/InternetLab/Second_Semester/common_resourses/picture/" . $newPictureName);
+                if (!$success) {
+                    echo $tmpName . "<br/>";
+                    echo $_SERVER["DOCUMENT_ROOT"] . "/InternetLab/Second_Semester/common_resourses/picture/" . $newPictureName . "<br/>";
+                    throw new Exception("Не удалось сохранить файл");
+                }
+            }
+        }
 
         if (!($errors["price"] || $errors["type"] || $errors["brand"])) {
             $typingORM->createRow([
-                "image" => $_POST["image"],
+                "image" => $newPictureName,
                 "productName" => $_POST["productName"],
                 "chemicalTypeID" => $_POST["type"],
                 "price" => $_POST["price"],
@@ -372,25 +392,26 @@ if (isset($_GET["action"])) {
                 "&productName={$_POST["productName"]}" .
                 "&image={$_POST["image"]}&chemicalTypeID={$_POST["type"]}&price={$_POST["price"]}&" .
                 "chemicalBrandID={$_POST["brand"]}&description={$_POST["description"]}";
-            $link = isset($errors["price"]) ? "&error_price=1" : "";
-            $link = isset($errors["brand"]) ? "&error_brand=1" : "";
-            $link = isset($errors["type"]) ? "&error_type=1" : "";
+            $link = isset ($errors["price"]) ? "&error_price=1" : "";
+            $link = isset ($errors["brand"]) ? "&error_brand=1" : "";
+            $link = isset ($errors["type"]) ? "&error_type=1" : "";
             header($link);
         }
     } else if ($_POST["form"] == "brand") {
-        if (isset($_POST["brandName"])) {
+        if (isset ($_POST["brandName"])) {
             $typingORM->createRow(["brandName" => $_POST["brandName"]]);
             header("Location: http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=brand&action=read_all");
         } else
             header("Location: http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=brand&action=create&isagain=1");
     }
-} else if (isset($_POST["type"])) {
+} else if (isset ($_POST["type"])) {
     $typingORM = ORM::fabric("brand");
     var_dump($_POST["type"]);
     switch ($_POST["type"]) {
         case "delete_product":
-            $typingORM = ORM::fabric("product");
             echo ("here");
+            $oldFile = (new Product)->getImageById($_POST["id"]);
+            unlink($_SERVER["DOCUMENT_ROOT"] . "/InternetLab/Second_Semester/common_resourses/picture/" . $oldFile);
             $typingORM->deleteRecordByID($_POST["id"]);
             header("Location: http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=product&action=read_all");
             die();
@@ -414,14 +435,14 @@ if (isset($_GET["action"])) {
             ;
 
     }
-} else if (isset($_POST["endingDelete"])) {
+} else if (isset ($_POST["endingDelete"])) {
 
     $typingORM = ORM::fabric("brand");
     $typingORM->deleteRecordByID($_POST["id"]);
     header("Location: http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=brand&action=read_all");
     die();
-} else if (isset($_POST["product_update"])) {
-    $typingORM = ORM::fabric("product");
+} else if (isset ($_POST["product_update"])) {
+    $typingORM = new Product;
     $errors = [];
     if (!ctype_digit($_POST["price"])) {
         $errors["price"] = true;
@@ -432,17 +453,43 @@ if (isset($_GET["action"])) {
     if (!ctype_digit($_POST["brand"]))
         $errors["brand"] = true;
 
+    $newPictureName = "";
+    if (!empty ($_FILES["image"])) {
+        $image = $_FILES["image"];
+        if ($image["error"] === UPLOAD_ERR_NO_FILE) {
+            $newPictureName = $typingORM->getImageById($_POST["id"]);
+
+        } else if ($image["error"] !== UPLOAD_ERR_OK) {
+            throw new Exception("Ошибка ввода файла");
+        } else {
+            $oldFile = (new Product)->getImageById($_POST["id"]);
+            unlink($_SERVER["DOCUMENT_ROOT"] . "/InternetLab/Second_Semester/common_resourses/picture/" . $oldFile);
+            $tmpName = $image["tmp_name"];
+            $newPictureName = md5(file_get_contents($_FILES['image']['tmp_name'])) . ".png";
+            $success = move_uploaded_file($tmpName, $_SERVER["DOCUMENT_ROOT"] . "/InternetLab/Second_Semester/common_resourses/picture/" . $newPictureName);
+            if (!$success) {
+                echo $tmpName . "<br/>";
+                echo $_SERVER["DOCUMENT_ROOT"] . "/InternetLab/Second_Semester/common_resourses/picture/" . $newPictureName . "<br/>";
+                throw new Exception("Не удалось сохранить файл");
+            }
+        }
+    } else {
+        $newPictureName = $typingORM->getImageById($_POST["id"]);
+    }
+
+
+    var_dump($_POST);
     $typingORM->updateRecord([
+        "image" => $newPictureName,
         "productName" => $_POST["productName"],
-        "image" => $_POST["image"],
-        "chemicalBrandID" => $_POST["brand"],
         "chemicalTypeID" => $_POST["product_type"],
         "price" => $_POST["price"],
+        "chemicalBrandID" => $_POST["brand"],
         "description" => $_POST["description"],
         "id" => $_POST["id"]
     ]);
     header("Location: http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=product&action=read_all");
-} else if (isset($_POST["brand_update"])) {
+} else if (isset ($_POST["brand_update"])) {
     $typingORM = ORM::fabric("brand");
     $errors = [];
 
@@ -451,6 +498,10 @@ if (isset($_GET["action"])) {
         "brand_id" => (int) $_POST["brand_id"],
     ]);
     header("Location: http://localhost/InternetLab/Second_Semester/Lab_1/crud/?type=brand&action=read_all");
+
+} else {
+    header("Location: http://localhost/InternetLab/Second_Semester/Lab_1/");
+    die();
 
 }
 

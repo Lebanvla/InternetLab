@@ -26,8 +26,8 @@ function MakeTableByData(array $results, array $need_fields_with_types, array $h
                 $link = $nowResult[$field["name"]]["link"];
                 $nowResult[$field["name"]] = '<a class="btn btn-info" role="button" href ="' . htmlspecialchars($link) . '"> ' . htmlspecialchars($text) . "</a>";
             } else if ($field["type"] == "picture") {
-                $link = "http://localhost/InternetLab/Second_Semester/common_resourses/picture/" . htmlspecialchars($nowResult[$field["name"]]) . ".png";
-                $nowResult[$field["name"]] = "<img src='{$link}'/>";
+                $link = "http://localhost/InternetLab/Second_Semester/common_resourses/picture/" . htmlspecialchars($nowResult[$field["name"]]);
+                $nowResult[$field["name"]] = "<img width='100' height='100'  src='{$link}'/>";
             } else if ($field["type"] == "form_button") {
                 $id = htmlspecialchars($nowResult[$field["name"]]["id"]);
                 $text_on_button = htmlspecialchars($nowResult[$field["name"]]["text"]);

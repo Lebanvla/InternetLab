@@ -2,7 +2,7 @@
 
 
 
-include("../core/DataBase.php");
+include ("../core/DataBase.php");
 
 abstract class ORM
 {
@@ -13,7 +13,7 @@ abstract class ORM
         while ($row = $result->fetch_assoc()) {
             $returningVal[] = $row;
         }
-        return($returningVal == [] ? null : $returningVal);
+        return ($returningVal == [] ? null : $returningVal);
     }
     public static function fabric(string $type)
     {
@@ -36,7 +36,7 @@ abstract class ORM
         $sql = "update " . $this->getTableName() . " SET ";
         $values = [];
         foreach ($fields as $field) {
-            if ($field === $this->idName() || !isset($AttributeValueArray[$field]))
+            if ($field === $this->idName() || !isset ($AttributeValueArray[$field]))
                 continue;
             $sql = $sql . $field . " = ?, ";
             $values[] = $AttributeValueArray[$field];
@@ -114,16 +114,16 @@ class Product extends ORM
             return $this->readAllRecords();
         }
         $query = DataBase::prepare("select * from products" . $this->getJoins() . " where " .
-            (isset($AttributeValueArray["brand"]) ? " chemicalBrandID = ? " : "") .
-            (isset($AttributeValueArray["brand"]) && isset($AttributeValueArray["type"]) ? " and " : "") .
-            (isset($AttributeValueArray["type"]) ? " chemicalTypeID = ? " : ""));
+            (isset ($AttributeValueArray["brand"]) ? " chemicalBrandID = ? " : "") .
+            (isset ($AttributeValueArray["brand"]) && isset ($AttributeValueArray["type"]) ? " and " : "") .
+            (isset ($AttributeValueArray["type"]) ? " chemicalTypeID = ? " : ""));
 
-        if (isset($AttributeValueArray["brand"]) && isset($AttributeValueArray["type"])) {
+        if (isset ($AttributeValueArray["brand"]) && isset ($AttributeValueArray["type"])) {
             $typeString = "ii";
             $query->bind_param($typeString, $AttributeValueArray["brand"]["value"], $AttributeValueArray["types"]["value"]);
         } else if (!is_null($AttributeValueArray["brand"]) || !is_null($AttributeValueArray["brand"])) {
             $typeString = "i";
-            $val = isset($AttributeValueArray["type"]) ? $AttributeValueArray["type"]["value"] : $AttributeValueArray["brand"]["value"];
+            $val = isset ($AttributeValueArray["type"]) ? $AttributeValueArray["type"]["value"] : $AttributeValueArray["brand"]["value"];
             $query->bind_param($typeString, $val);
         }
 
@@ -159,6 +159,14 @@ class Product extends ORM
     protected function idName(): string
     {
         return "id";
+    }
+
+    function getImageById(int $id)
+    {
+        $stmt = DataBase::prepare("select image from products where id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        return $this->mysqliresult_to_array($stmt->get_result())[0]["image"];
     }
 }
 
