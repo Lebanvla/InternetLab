@@ -409,6 +409,7 @@ if (isset ($_GET["action"])) {
     var_dump($_POST["type"]);
     switch ($_POST["type"]) {
         case "delete_product":
+            $typingORM = ORM::fabric("product");
             echo ("here");
             $oldFile = (new Product)->getImageById($_POST["id"]);
             unlink($_SERVER["DOCUMENT_ROOT"] . "/InternetLab/Second_Semester/common_resourses/picture/" . $oldFile);
