@@ -1,0 +1,12 @@
+{
+    "name": "lebanvla/internet-lab",
+    "type": "project",
+    "require": {
+        "silex/silex": "2.0"
+    },
+    "authors": [
+        {
+            "name": "Lebanvla"
+        }
+    ]
+}
