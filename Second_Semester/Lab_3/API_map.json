@@ -1,0 +1,52 @@
+{
+    "types" : [
+        {"0": "brands"},
+        {"1": "products"}
+    ],
+    "methods" : [
+        {
+            "brands" : 
+            [
+                "brand-list", 
+                {"brand-create" : "name"}, 
+                {"brand-update" : ["id", "name"]}, 
+                {"brand-delete" : "id"}
+            ]
+        },
+
+        {
+            "products" :
+            [
+                [
+                    "product-list", 
+                    {   
+                        "product-create" : 
+                        [
+                            "name", "price", "brand_id", "group_id", "description", "image"      
+                        ]
+                    },
+                    {
+                        "product-update": 
+                        [
+                            "id", "name", "price", "brand_id", "group_id", "description", "image"      
+                        ]
+                    },
+                    {
+                        "product-delete" : 
+                        [
+                            "id"
+                        ]
+                    }, 
+                    {
+                        "product-list-sorted" : 
+                        [
+                            "brand_id"
+                        ]
+                    } 
+                    
+                ]
+            ]
+        }
+    ]
+
+}

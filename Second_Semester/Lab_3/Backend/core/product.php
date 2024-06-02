@@ -10,6 +10,7 @@
                 'brand_id'=>'i',
                 'group_id'=>'i',
                 'description'=> 's',
+                'image'=> 's',
             );
         }
 

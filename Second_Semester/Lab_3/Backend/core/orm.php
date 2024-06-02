@@ -11,7 +11,7 @@
                 return new Products();
             case "brand":
                 return new Brands();
-            case "group":
+            case "type":
                 return new Groups();
             default:
                 throw new InvalidArgumentException("Передан неверный аргумент");
@@ -68,7 +68,7 @@
 
         public function get_row_by_id($id){
             $sql = "select * from " . $this->get_table_name(). " where id = ?";
-            return DataBase::prepared_query($sql, "i", array($id));
+            return DataBase::prepared_query($sql, "i", array($id))[0];
         }
 
 
@@ -129,6 +129,7 @@
                 }
             }
         }
+
     }
 
 
