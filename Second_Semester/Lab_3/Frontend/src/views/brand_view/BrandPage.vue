@@ -1,7 +1,7 @@
 <script setup>
 import {onMounted, ref} from 'vue';
+import axios from "axios"
 const brand_list = ref({}); 
-
 
 onMounted(
     ()=>{
@@ -11,25 +11,21 @@ onMounted(
 )
 
 async function delete_brand(id){
-    const response = await fetch(
-        "http://localhost/delete-brand/",
-        {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body:{
-                "id": id
-            }
-        }
-    );
+    axios.post("http://localhost/delete-brand", {"brand_id": id})
+    .then((response) => {
+        brand_list.value = brand_list.value.filter(item => item.brand_id != id);
+    })
+    .catch(function (error) {
+        console.log(error);
+    });
+
 }
 
 
 async function get_brand_list(){
         const response = await fetch("http://localhost/brand-list.json");
         brand_list.value = (await response.json())["brands"];
-    }
+}
 
 </script>
 
@@ -50,15 +46,19 @@ async function get_brand_list(){
         <tbody>
             <tr v-for="brand in brand_list">
                 <td>
-                    {{ brand.name }}
+                    <RouterLink :to="/products/ + brand.brand_id">{{brand.brand_name}}</RouterLink>
                 </td>
                 <td>
-                    <RouterLink class="btn btn-secondary" to="/brand_change_form">Изменить компанию</RouterLink>
+                    <RouterLink class="btn btn-success" :to="/brand_change_form/ + brand.brand_id">Изменить компанию</RouterLink>
                 </td>
                 <td>
-                    <button class="btn btn-secondary" @click="delete_brand(brand.id)">Удалить компанию</button>
+                    <button class="btn btn-danger" @click="delete_brand(brand.brand_id)">Удалить компанию</button>
                 </td>
             </tr>
         </tbody>
     </table>
+
+
+    <RouterLink class="btn btn-success" to="/brand_create_form">Создать компанию</RouterLink>
+
 </template>

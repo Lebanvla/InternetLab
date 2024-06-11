@@ -1,5 +1,6 @@
 <script setup>
 import {onMounted, ref} from 'vue';
+
 const product_list = ref({}); 
 
 
@@ -27,9 +28,8 @@ async function delete_product(id){
 
 
 async function get_product_list(){
-        const product_response = await fetch("http://localhost/product-list.json");
+        const product_response = await fetch("http://localhost/product-list-sorted/" + window.location.href.split("/").at(-1) + ".json");
         product_list.value = (await product_response.json())["products"];
-
     }
 
 </script>
@@ -66,21 +66,25 @@ async function get_product_list(){
                     {{ product.price }}
                 </td>
                 <td>
-                    {{ product.brand_id }}
+                    {{ product.brand_name }}
                 </td>
                 <td>
-                    {{ product.group_id }}
+                    {{ product.group_name }}
                 </td>
                 <td>
                     {{ product.description }}
                 </td>
                 <td>
-                    <RouterLink class="btn btn-secondary" to="/product_change_form">Изменить продукт</RouterLink>
+                    <RouterLink class="btn btn-success" :to="/product_change_form/ + product.id">Изменить продукт</RouterLink>
                 </td>
                 <td>
-                    <button class="btn btn-secondary" @click="delete_product(product.id)">Удалить продукт</button>
+                    <button class="btn btn-danger" @click="delete_product(product.id)">Удалить продукт</button>
                 </td>
             </tr>
         </tbody>
     </table>
+
+    <RouterLink class="btn btn-success" to="/product_create_form/">Создать продукт</RouterLink>
+
+
 </template>
